@@ -10,11 +10,11 @@
         class="demo-ruleForm"
         label-position="top"
       >
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model="ruleForm.name"></el-input>
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="ruleForm.username"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input v-model="ruleForm.password"></el-input>
+          <el-input v-model="ruleForm.password" type="password"></el-input>
         </el-form-item>
 
         <el-form-item>
@@ -27,15 +27,16 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
       ruleForm: {
-        name: "",
-        password: ""
+        username: "admin",
+        password: "123456"
       },
       rules: {
-        name: [
+        username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
           { min: 4, max: 12, message: "长度在 4 到 12 个字符", trigger: "blur" }
         ],
@@ -50,9 +51,18 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          alert("submit!");
+          // alert("submit!");
+          axios({
+            url: "http://localhost:8888/api/private/v1/login",
+            method: "post",
+            data: this.ruleForm
+          }).then(({ data: { data, meta } }) => {
+            if (meta.status === 200) {
+              localStorage.setItem("token", data.token);
+              this.$router.push("/home");
+            }
+          });
         } else {
-          console.log("error submit!!");
           return false;
         }
       });
