@@ -9,8 +9,13 @@
     <!-- 搜索 添加用户栏 -->
     <el-row :gutter="20">
       <el-col :span="6">
-        <el-input placeholder="请输入内容" class="input-with-select">
-          <el-button slot="append" icon="el-icon-search"></el-button>
+        <el-input
+          placeholder="请输入内容"
+          class="input-with-select"
+          v-model="keyword"
+          @keyup.enter.native="searchUser"
+        >
+          <el-button slot="append" icon="el-icon-search" @click="searchUser"></el-button>
         </el-input>
       </el-col>
       <el-col :span="2">
@@ -55,7 +60,8 @@ export default {
       tableData: [],
       total: 0,
       currentPage: 1,
-      pageSize: 3
+      pageSize: 3,
+      keyword: ""
     };
   },
   created() {
@@ -68,6 +74,7 @@ export default {
         url: "users",
         method: "get",
         params: {
+          query: this.keyword,
           pagenum: this.currentPage,
           pagesize: this.pageSize
         }
@@ -75,7 +82,7 @@ export default {
         let {
           data: { data, meta }
         } = res;
-        console.log(res);
+        // console.log(res);
         this.tableData = data.users;
         this.total = data.total;
       });
@@ -84,6 +91,12 @@ export default {
     onPageChange(page) {
       // console.log(page);
       this.currentPage = page;
+      this.getUserList();
+    },
+    //搜索相匹配的用户
+    searchUser() {
+      console.log(1);
+
       this.getUserList();
     }
   }
