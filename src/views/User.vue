@@ -19,7 +19,6 @@
 
 
 <script>
-import axios from "axios";
 export default {
   data() {
     return {
@@ -27,15 +26,12 @@ export default {
     };
   },
   created() {
-    axios({
-      url: "http://localhost:8888/api/private/v1/users",
+    this.$http({
+      url: "users",
       method: "get",
       params: {
         pagenum: 1,
         pagesize: 5
-      },
-      headers: {
-        Authorization: localStorage.getItem("token")
       }
     }).then(({ data: { data, meta } }) => {
       //   console.log(data, meta);
