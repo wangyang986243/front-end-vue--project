@@ -1,3 +1,153 @@
 <template>
-  <div>这是home页！！</div>
+  <el-container>
+    <el-header>
+      <el-row type="flex" justify="space-between" align="middle">
+        <el-col :span="6">
+          <div class="grid-content bg-purple topleft">
+            <img src="../assets/logo.png" alt />
+          </div>
+        </el-col>
+        <el-col>
+          <div class="grid-content bg-purple-light">
+            <h1>品优购后台管理系统</h1>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="grid-content bg-purple topRight">
+            <span>欢迎39期星耀会员</span>
+            <a href="#">退出</a>
+          </div>
+        </el-col>
+      </el-row>
+    </el-header>
+    <el-container>
+      <el-aside width="200px">
+        <!-- //////////////////////////////////// -->
+        <el-row class="tac">
+          <el-menu
+            :default-active="$route.path"
+            :router="true"
+            :unique-opened="true"
+            class="el-menu-vertical-demo"
+            background-color="#545c64"
+            text-color="#fff"
+            active-text-color="#ffd04b"
+          >
+            <el-submenu index="1">
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>用户管理</span>
+              </template>
+              <el-menu-item index="/user">
+                <i class="el-icon-menu"></i>
+                用户管理
+              </el-menu-item>
+            </el-submenu>
+            <el-submenu index="2">
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>权限管理</span>
+              </template>
+              <el-menu-item index="2-1">
+                <i class="el-icon-menu"></i>
+                角色列表
+              </el-menu-item>
+              <el-menu-item index="2-2">
+                <i class="el-icon-menu"></i>
+                权限列表
+              </el-menu-item>
+            </el-submenu>
+            <el-submenu index="3">
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>商品管理</span>
+              </template>
+              <el-menu-item index="3-1">
+                <i class="el-icon-menu"></i>
+                商品列表
+              </el-menu-item>
+              <el-menu-item index="3-2">
+                <i class="el-icon-menu"></i>
+                分类参数
+              </el-menu-item>
+              <el-menu-item index="3-3">
+                <i class="el-icon-menu"></i>
+                商品分类
+              </el-menu-item>
+            </el-submenu>
+            <el-submenu index="4">
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>订单管理</span>
+              </template>
+              <el-menu-item index="4-1">
+                <i class="el-icon-menu"></i>
+                订单列表
+              </el-menu-item>
+            </el-submenu>
+            <el-submenu index="5">
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>数据统计</span>
+              </template>
+              <el-menu-item index="1-1">
+                <i class="el-icon-menu"></i>
+                数据列表
+              </el-menu-item>
+            </el-submenu>
+          </el-menu>
+        </el-row>
+        <!-- ////////////////////////////////////// -->
+      </el-aside>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
+    </el-container>
+  </el-container>
 </template>
+
+<script>
+export default {
+  methods: {}
+};
+</script>
+
+
+
+<style>
+.el-container {
+  height: 100%;
+}
+.el-header {
+  background-color: #b3c1cd;
+  padding: 0 !important;
+}
+.el-col {
+  text-align: center;
+}
+.el-col h1 {
+  padding: 0;
+  margin: 0;
+  font-size: 28px;
+  color: #fff;
+  font-weight: 700;
+}
+.topleft {
+  text-align: left;
+}
+.topleft img {
+  width: 200px;
+}
+.topRight {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: right;
+  padding-right: 20px;
+}
+.topRight a {
+  color: orange;
+}
+.el-container .el-aside {
+  background-color: rgb(84, 92, 100);
+}
+</style>

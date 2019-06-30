@@ -103,6 +103,9 @@ export default {
   padding: 30px 20px;
   min-width: 400px;
 }
+.el-form--label-top .el-form-item__label {
+  float: left !important;
+}
 </style>
 
 
