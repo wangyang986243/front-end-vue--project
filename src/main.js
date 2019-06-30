@@ -16,7 +16,7 @@ axios.defaults.baseURL = 'http://localhost:8888/api/private/v1/'
 //设置axios 的请求拦截器 ，解决以后每次都要写hedaers
 axios.interceptors.request.use(function(config) {
   config.headers.Authorization = localStorage.getItem('token')
-  console.log(config)
+  // console.log(config)
   return config
 })
 
