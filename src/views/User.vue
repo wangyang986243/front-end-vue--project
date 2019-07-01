@@ -22,7 +22,6 @@
         <el-button type="success" plain @click="addUserDialog">添加用户</el-button>
       </el-col>
     </el-row>
-
     <!-- 主体内容 -->
     <el-table :data="tableData" stripe style="width: 100%">
       <el-table-column prop="username" label="姓名" width="180"></el-table-column>
@@ -30,13 +29,27 @@
       <el-table-column prop="mobile" label="电话"></el-table-column>
       <el-table-column label="用户状态">
         <template v-slot="{row}">
-          <el-switch v-model="row.mg_state" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+          <el-switch
+            v-model="row.mg_state"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            @change="stateChange(row)"
+          >row</el-switch>
         </template>
       </el-table-column>
+
       <el-table-column label="操作">
-        <el-button type="primary" icon="el-icon-edit" plain size="mini"></el-button>
-        <el-button type="danger" icon="el-icon-delete-solid" plain size="mini"></el-button>
-        <el-button type="success" plain size="mini">分配角色</el-button>
+        <template v-slot="{row}">
+          <el-button
+            type="primary"
+            icon="el-icon-edit"
+            plain
+            size="mini"
+            @click="editUserDialog(row)"
+          ></el-button>
+          <el-button type="danger" icon="el-icon-delete-solid" plain size="mini"></el-button>
+          <el-button type="success" plain size="mini">分配角色</el-button>
+        </template>
       </el-table-column>
     </el-table>
     <!-- 分页器 -->
@@ -49,8 +62,8 @@
       @current-change="onPageChange"
     ></el-pagination>
     <!-- 添加用户 模态框 -->
-    <el-dialog title="添加用户" :visible.sync="dialogFormVisible" label-width="100px">
-      <el-form :model="addUserForm" :rules="addUserRules" ref="addUserForm">
+    <el-dialog title="添加用户" :visible.sync="isAddUserDialogShow" label-width="100px">
+      <el-form :model="addUserForm" :rules="addUserRules" ref="addUserForm" label-width="100px">
         <el-form-item label="用户名" prop="username">
           <el-input autocomplete="off" v-model="addUserForm.username"></el-input>
         </el-form-item>
@@ -65,8 +78,26 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button @click="isAddUserDialogShow = false">取 消</el-button>
         <el-button type="primary" @click="addUser('addUserForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 修改用户 模态框 -->
+    <el-dialog title="修改用户信息" :visible.sync="isEditUserDialogShow" label-width="100px">
+      <el-form :model="editUserForm" :rules="editUserRules" ref="editUserForm" label-width="100px">
+        <el-form-item label="用户名" prop="username">
+          <el-tag type="info" v-text="editUserForm.username"></el-tag>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input autocomplete="off" v-model="editUserForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" prop="mobile">
+          <el-input autocomplete="off" v-model="editUserForm.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isEditUserDialogShow=false">取 消</el-button>
+        <el-button type="primary" @click="editUser('editUserForm')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -83,7 +114,8 @@ export default {
       currentPage: 1,
       pageSize: 3,
       keyword: "",
-      dialogFormVisible: false,
+      isAddUserDialogShow: false,
+      isEditUserDialogShow: false,
       //增加用户模态框
       addUserForm: {
         username: "",
@@ -111,6 +143,30 @@ export default {
             trigger: "change"
           }
         ],
+        email: [
+          {
+            pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
+            message: "请输入正确的邮箱",
+            trigger: "change"
+          }
+        ],
+        mobile: [
+          {
+            pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
+            message: "请输入正确的电话号码",
+            trigger: "change"
+          }
+        ]
+      },
+      //修改用户模态框
+      editUserForm: {
+        id: -1,
+        username: "",
+        email: "",
+        mobile: ""
+      },
+      //修改用户 模态框表当验证
+      editUserRules: {
         email: [
           {
             pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
@@ -163,7 +219,7 @@ export default {
     },
     //点击增加用户，跳出增加用户模态框
     addUserDialog() {
-      this.dialogFormVisible = true;
+      this.isAddUserDialogShow = true;
     },
     //添加用户功能实现
     async addUser(addUserForm) {
@@ -186,7 +242,7 @@ export default {
             type: "success",
             duration: 1000
           });
-          this.dialogFormVisible = false;
+          this.isAddUserDialogShow = false;
           this.getUserList();
         } else {
           this.$message({
@@ -208,7 +264,7 @@ export default {
             }).then(res => {
               console.log(res);
               if (res.data.meta.status === 201) {
-                this.dialogFormVisible = false;
+                this.isAddUserDialogShow = false;
                 this.getUserList();
               }
             });
@@ -218,6 +274,69 @@ export default {
           }
         }
         ); */
+    },
+    //用户状态切换
+    async stateChange(row) {
+      // console.log(row);
+      let res = await this.$http({
+        url: `users/${row.id}/state/$(row.mg_state)`,
+        method: "put"
+      });
+      // console.log(res);
+      if (res.data.meta.status === 200) {
+        this.$message({
+          message: res.data.meta.msg,
+          type: "success",
+          duration: 1000
+        });
+      } else {
+        this.$message({
+          message: res.data.meta.msg,
+          type: "error",
+          duration: 1000
+        });
+        //{解释：后天请求数据失败之后，页面的switch按钮不应该发生改变，所以这个时候要手动的更改状态}
+        row.mg_state = !row.mg_state;
+      }
+    },
+    //点击操作的修改用户按钮，跳出修改用户模态框
+    editUserDialog(row) {
+      this.isEditUserDialogShow = true;
+      console.log(row);
+      this.editUserForm.id = row.id;
+      this.editUserForm.username = row.username;
+      this.editUserForm.email = row.email;
+      this.editUserForm.mobile = row.mobile;
+    },
+    //修改用户功能的实现
+    async editUser(editUserForm) {
+      try {
+        let valid = await this.$refs[editUserForm].validate();
+        // console.log(valid);
+        let res = await this.$http({
+          url: `users/${this.editUserForm.id}`,
+          method: "put",
+          data: this.editUserForm
+        });
+        console.log(res);
+        if (res.data.meta.status === 200) {
+          this.$message({
+            message: res.data.meta.msg,
+            type: "success",
+            duration: 1000
+          });
+          this.isEditUserDialogShow = false;
+          this.getUserList();
+        } else {
+          this.$message({
+            message: res.data.meta.msg,
+            type: "error",
+            duration: 1000
+          });
+        }
+      } catch (err) {
+        console.log("校验失败", err);
+      }
     }
   }
 };
