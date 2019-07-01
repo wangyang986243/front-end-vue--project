@@ -47,7 +47,13 @@
             size="mini"
             @click="editUserDialog(row)"
           ></el-button>
-          <el-button type="danger" icon="el-icon-delete-solid" plain size="mini"></el-button>
+          <el-button
+            type="danger"
+            icon="el-icon-delete-solid"
+            plain
+            size="mini"
+            @click="deleteUser(row.id)"
+          ></el-button>
           <el-button type="success" plain size="mini">分配角色</el-button>
         </template>
       </el-table-column>
@@ -100,6 +106,7 @@
         <el-button type="primary" @click="editUser('editUserForm')">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 删除用户 提示信息 -->
   </div>
 </template>
 
@@ -111,7 +118,7 @@ export default {
     return {
       tableData: [],
       total: 0,
-      currentPage: 1,
+      currentPage: 2,
       pageSize: 3,
       keyword: "",
       isAddUserDialogShow: false,
@@ -336,6 +343,56 @@ export default {
         }
       } catch (err) {
         console.log("校验失败", err);
+      }
+    },
+    //删除用户
+    // deleteUser(id) {
+    //   this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+    //     confirmButtonText: "确定",
+    //     cancelButtonText: "取消",
+    //     type: "warning"
+    //   })
+    //     .then(() => {
+    //       this.$message({
+    //         type: "success",
+    //         message: "删除成功!"
+    //       });
+    //     })
+    //     .catch(() => {
+    //       this.$message({
+    //         type: "info",
+    //         message: "已取消删除"
+    //       });
+    //     });
+    // }
+    async deleteUser(id) {
+      try {
+        await this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        });
+
+        let res = await this.$http({
+          url: `users/${id}`,
+          method: "delete",
+          data: id
+        });
+        console.log(res);
+
+        if (res.data.meta.status === 200) {
+          this.$message({
+            message: res.data.meta.msg,
+            type: "success",
+            duration: 1000
+          });
+          this.getUserList();
+        }
+      } catch (err) {
+        this.$message({
+          type: "info",
+          message: "已取消删除"
+        });
       }
     }
   }
