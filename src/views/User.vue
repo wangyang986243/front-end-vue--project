@@ -19,7 +19,7 @@
         </el-input>
       </el-col>
       <el-col :span="2">
-        <el-button type="success" plain>添加用户</el-button>
+        <el-button type="success" plain @click="addUserDialog">添加用户</el-button>
       </el-col>
     </el-row>
 
@@ -48,6 +48,27 @@
       :page-size="pageSize"
       @current-change="onPageChange"
     ></el-pagination>
+    <!-- 添加用户 模态框 -->
+    <el-dialog title="添加用户" :visible.sync="dialogFormVisible" label-width="100px">
+      <el-form :model="addUserForm" :rules="addUserRules" ref="addUserForm">
+        <el-form-item label="用户名" prop="username">
+          <el-input autocomplete="off" v-model="addUserForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input autocomplete="off" v-model="addUserForm.password"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input autocomplete="off" v-model="addUserForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" prop="mobile">
+          <el-input autocomplete="off" v-model="addUserForm.mobile"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addUser('addUserForm')">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -61,7 +82,50 @@ export default {
       total: 0,
       currentPage: 1,
       pageSize: 3,
-      keyword: ""
+      keyword: "",
+      dialogFormVisible: false,
+      //增加用户模态框
+      addUserForm: {
+        username: "",
+        password: "",
+        email: "",
+        mobile: ""
+      },
+      //增加用户 模态框表单验证
+      addUserRules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          {
+            min: 4,
+            max: 12,
+            message: "长度在 4到 12 个字符",
+            trigger: "change"
+          }
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          {
+            min: 6,
+            max: 12,
+            message: "长度在 6到 12 个字符",
+            trigger: "change"
+          }
+        ],
+        email: [
+          {
+            pattern: /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/,
+            message: "请输入正确的邮箱",
+            trigger: "change"
+          }
+        ],
+        mobile: [
+          {
+            pattern: /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/,
+            message: "请输入正确的电话号码",
+            trigger: "change"
+          }
+        ]
+      }
     };
   },
   created() {
@@ -95,19 +159,78 @@ export default {
     },
     //搜索相匹配的用户
     searchUser() {
-      console.log(1);
-
       this.getUserList();
+    },
+    //点击增加用户，跳出增加用户模态框
+    addUserDialog() {
+      this.dialogFormVisible = true;
+    },
+    //添加用户功能实现
+    async addUser(addUserForm) {
+      try {
+        //解释：因为这边校验表单是异步的，所以在async函数里，我们就把它用valid来接收await后面的promise对象
+        let valid = await this.$refs[addUserForm].validate();
+        // 打印这里的valid 应该是true，如果是true则是校验成功，如果是是false，则是校验不成功，这个时候，就要处理校验不成功的情况，校验不成功又会报错，所以需要把校验不成功的情况放到catch函数里
+        console.log("校验成功");
+        //发送ajax请求
+        let res = await this.$http({
+          url: "users",
+          method: "post",
+          data: this.addUserForm
+        });
+        console.log(res);
+
+        if (res.data.meta.status === 201) {
+          this.$message({
+            message: res.data.meta.msg,
+            type: "success",
+            duration: 1000
+          });
+          this.dialogFormVisible = false;
+          this.getUserList();
+        } else {
+          this.$message({
+            message: res.data.meta.msg,
+            type: "error",
+            duration: 1000
+          });
+        }
+      } catch (err) {
+        console.log("校验失败");
+      }
+      //没有用async和await的代码
+      /* this.$refs[addUserForm].validate(valid => {
+          if (valid) {
+            this.$http({
+              url: "users",
+              method: "post",
+              data: this.addUserForm
+            }).then(res => {
+              console.log(res);
+              if (res.data.meta.status === 201) {
+                this.dialogFormVisible = false;
+                this.getUserList();
+              }
+            });
+          } else {
+            console.log("error submit!!");
+            return false;
+          }
+        }
+        ); */
     }
   }
 };
 </script>
 <style>
 .el-breadcrumb {
-  background-color: #d4dae0;
+  background-color: cyan;
   height: 50px;
   line-height: 50px !important;
   font-size: 16px !important;
   padding-left: 10px;
+}
+.el-form {
+  padding: 0;
 }
 </style>
