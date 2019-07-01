@@ -15,7 +15,7 @@
         <el-col :span="6">
           <div class="grid-content bg-purple topRight">
             <span>欢迎39期星耀会员</span>
-            <a href="#">退出</a>
+            <a href="#" @click.prevent="loginOut">退出</a>
           </div>
         </el-col>
       </el-row>
@@ -108,7 +108,12 @@
 
 <script>
 export default {
-  methods: {}
+  methods: {
+    loginOut() {
+      this.$router.push("/login");
+      localStorage.removeItem("token");
+    }
+  }
 };
 </script>
 

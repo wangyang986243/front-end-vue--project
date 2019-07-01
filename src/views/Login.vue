@@ -100,7 +100,7 @@ export default {
 .el-form {
   background-color: #fff;
   border-radius: 10px;
-  padding: 30px 20px;
+  padding: 30px 20px !important;
   min-width: 400px;
 }
 .el-form--label-top .el-form-item__label {
