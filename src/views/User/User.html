@@ -151,6 +151,9 @@
         <el-tag type="info" v-text="assignRolesForm.username"></el-tag>
       </el-form-item>
       <el-form-item label="角色">
+        <!-- 
+          参数说明： ：value是指下拉选择框的子选择框的内容
+         -->
         <el-select v-model="assignRolesForm.rid" placeholder="请选择">
           <el-option
             v-for="item in roleList"
