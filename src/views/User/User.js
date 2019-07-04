@@ -8,6 +8,7 @@ export default {
       keyword: '',
       isAddUserDialogShow: false,
       isEditUserDialogShow: false,
+      isAssignRolesDialogShow: false,
       //增加用户模态框
       addUserForm: {
         username: '',
@@ -73,7 +74,11 @@ export default {
             trigger: 'change'
           }
         ]
-      }
+      },
+      //分配角色
+      assignRolesForm: {},
+      //分配角色数据
+      roleList: []
     }
   },
   created() {
@@ -146,26 +151,6 @@ export default {
       } catch (err) {
         console.log('校验失败')
       }
-      //没有用async和await的代码
-      /* this.$refs[addUserForm].validate(valid => {
-          if (valid) {
-            this.$http({
-              url: "users",
-              method: "post",
-              data: this.addUserForm
-            }).then(res => {
-              console.log(res);
-              if (res.data.meta.status === 201) {
-                this.isAddUserDialogShow = false;
-                this.getUserList();
-              }
-            });
-          } else {
-            console.log("error submit!!");
-            return false;
-          }
-        }
-        ); */
     },
     //用户状态切换
     async stateChange(row) {
@@ -231,25 +216,6 @@ export default {
       }
     },
     //删除用户
-    // deleteUser(id) {
-    //   this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
-    //     confirmButtonText: "确定",
-    //     cancelButtonText: "取消",
-    //     type: "warning"
-    //   })
-    //     .then(() => {
-    //       this.$message({
-    //         type: "success",
-    //         message: "删除成功!"
-    //       });
-    //     })
-    //     .catch(() => {
-    //       this.$message({
-    //         type: "info",
-    //         message: "已取消删除"
-    //       });
-    //     });
-    // }
     async deleteUser(id) {
       try {
         await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
@@ -278,6 +244,42 @@ export default {
           type: 'info',
           message: '已取消删除'
         })
+      }
+    },
+    // 点击分配角色 出现分配角色模态框
+    async assignRolesDialog(row) {
+      this.isAssignRolesDialogShow = true
+      let res = await this.$http({
+        url: `users/${row.id}`,
+        method: 'get'
+      })
+      // console.log(res)
+      this.assignRolesForm = res.data.data
+      let roleListResult = await this.$http({
+        url: 'roles'
+      })
+      // console.log(roleListResult)
+      this.roleList = roleListResult.data.data
+    },
+    //分配角色模态框 确定分配角色
+    async assignRoles() {
+      console.log(1)
+      let res = await this.$http({
+        url: `users/${this.assignRolesForm.id}/role`,
+        method: 'put',
+        data: {
+          rid: this.assignRolesForm.rid
+        }
+      })
+      console.log(res)
+      if (res.data.meta.status === 200) {
+        this.$message({
+          type: 'success',
+          message: res.data.meta.msg,
+          duration: 1000
+        })
+        this.isAssignRolesDialogShow = false
+        this.getUserList()
       }
     }
   }
