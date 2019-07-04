@@ -156,10 +156,10 @@ export default {
     async stateChange(row) {
       // console.log(row);
       let res = await this.$http({
-        url: `users/${row.id}/state/$(row.mg_state)`,
+        url: `users/${row.id}/state/${row.mg_state}`,
         method: 'put'
       })
-      // console.log(res);
+      console.log(res)
       if (res.data.meta.status === 200) {
         this.$message({
           message: res.data.meta.msg,

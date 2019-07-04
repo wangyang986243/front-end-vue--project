@@ -74,7 +74,7 @@ export default {
       url: "menus",
       method: "get"
     });
-    console.log(res);
+    // console.log(res);
     this.rightsList = res.data.data;
   }
 };
