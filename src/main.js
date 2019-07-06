@@ -19,6 +19,16 @@ axios.interceptors.request.use(function(config) {
   // console.log(config)
   return config
 })
+//设置axious的响应拦截器
+axios.interceptors.response.use(function(response) {
+  // 对响应数据做点什么
+  /* 当令牌过期的是时候，直接跳到login页面 */
+  console.log(response)
+  if (response.data.meta.status === 401) {
+    router.push('/login')
+  }
+  return response
+})
 
 Vue.config.productionTip = false
 
