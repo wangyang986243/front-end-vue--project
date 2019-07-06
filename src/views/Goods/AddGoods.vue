@@ -95,7 +95,7 @@ export default {
         goods_number: "",
         goods_weight: "",
         goods_introduce: "",
-        is_promote: "0",
+        is_promote: "0 ",
         pics: []
       },
       addGoodsOptions: [],

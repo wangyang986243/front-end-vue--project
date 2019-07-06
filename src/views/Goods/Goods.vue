@@ -14,7 +14,9 @@
       <el-table-column prop="goods_name" label="商品名称"></el-table-column>
       <el-table-column prop="goods_price" label="商品价格"></el-table-column>
       <el-table-column prop="goods_weight" label="商品重量"></el-table-column>
-      <el-table-column prop="add_time" label="创建时间"></el-table-column>
+      <el-table-column label="创建时间">
+        <template v-slot="{row}">{{row.add_time | time}}</template>
+      </el-table-column>
       <el-table-column label="操作">
         <template v-slot="{row}">
           <el-button
@@ -49,6 +51,7 @@
 
 
 <script>
+import moment from "moment";
 export default {
   data() {
     return {
@@ -60,6 +63,8 @@ export default {
   },
 
   created() {
+    // console.log(moment.unix(1562405909));
+
     this.getGoodsData();
   },
   methods: {
@@ -84,6 +89,11 @@ export default {
     onPageChange(currentPage) {
       this.currentPage = currentPage;
       this.getGoodsData();
+    }
+  },
+  filters: {
+    time(number) {
+      return moment.unix(number).format("YYYY-MM-DD HH:mm:ss");
     }
   }
 };
