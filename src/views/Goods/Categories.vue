@@ -76,11 +76,12 @@
             v-model="addCategoriesForm.parentArr"
             :options="cateOptions"
             :props="defaultProps"
+            :clearable="true"
           ></el-cascader>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="isAddCategoriesDialogShow = false">取 消</el-button>
+        <el-button @click="deleteAddcategories">取 消</el-button>
         <el-button type="primary" @click="addCategories">确 定</el-button>
       </div>
     </el-dialog>
@@ -173,7 +174,7 @@ export default {
           cat_level
         }
       });
-      console.log(res);
+      // console.log(res);
       if (res.data.meta.status === 201) {
         this.$message({
           type: "success",
@@ -182,9 +183,17 @@ export default {
         });
         this.isAddCategoriesDialogShow = false;
         this.getCategoriesData();
-        // this.$refs[addCateForm].resetFields();
-        this.$refs.addCateForm.resetFields();
+        this.$refs["addCateForm"].resetFields();
+        // console.log(this.$refs["addCateForm"]);
+
+        // this.$refs.addCateForm.resetFields();
       }
+    },
+    // 点击取消按钮，重置表单
+    deleteAddcategories() {
+      // this.$refs.addCateForm.resetFields();
+      this.$refs["addCateForm"].resetFields();
+      this.isAddCategoriesDialogShow = false;
     }
   }
 };
